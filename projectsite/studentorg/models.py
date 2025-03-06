@@ -12,14 +12,14 @@ class BaseModel(models.Model):
 class College(BaseModel):
     college_name = models.CharField(max_length=150)
 
-    def _str_(self):
+    def __str__(self):
         return self.college_name
 
 class Program(BaseModel):
     prog_name = models.CharField(max_length=150)
     college = models.ForeignKey(College, on_delete=models.CASCADE)
 
-    def _Str_(self):
+    def __str__(self):
         return self.prog_name
 
 class Organization(BaseModel):
@@ -28,7 +28,7 @@ class Organization(BaseModel):
         College, null=True, blank=True, on_delete=models.CASCADE)
     description = models.CharField(max_length=500)
 
-    def _str_(self):
+    def __str__(self):
         return self.name
     
 class Student(BaseModel):
@@ -38,8 +38,8 @@ class Student(BaseModel):
     middlename = models.CharField(max_length=25, blank=True, null=True)
     program = models.ForeignKey(Program, on_delete=models.CASCADE)
     
-    def _str(self):
-        return f"{self.lastname},{self.firstname}"
+    def __str__(self):
+        return f"{self.lastname}, {self.firstname}"
     
 class OrgMember(BaseModel):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
