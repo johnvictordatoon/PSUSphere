@@ -34,4 +34,8 @@ urlpatterns = [
     path('student_list/add/', views.StudentCreateView.as_view(), name='student-add'),
     path('student_list/<pk>/', views.StudentUpdateView.as_view(), name='student-update'),
     path('student_list/<pk>/delete/', views.StudentDeleteView.as_view(), name='student-delete'),
+    path('college_list/', views.CollegeListView.as_view(), name='college-list'),
+    path('college_list/add/', views.CollegeCreateView.as_view(), name='college-add'),
+    path('college_list/<pk>/', views.CollegeUpdateView.as_view(), name='college-update'),
+    path('college_list/<pk>/delete/', views.CollegeDeleteView.as_view(), name='college-delete'),
 ]
