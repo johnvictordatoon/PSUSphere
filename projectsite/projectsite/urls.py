@@ -15,9 +15,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from studentorg.views import HomePageView, OrganizationList, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView
 from studentorg import views
+from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LoginView, LogoutView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,4 +44,6 @@ urlpatterns = [
     path('program_list/add/', views.ProgramCreateView.as_view(), name='program-add'),
     path('program_list/<pk>/', views.ProgramUpdateView.as_view(), name='program-update'),
     path('program_list/<pk>/delete/', views.ProgramDeleteView.as_view(), name='program-delete'),
+    path('login/', LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]
