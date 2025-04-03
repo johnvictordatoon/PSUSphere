@@ -116,12 +116,12 @@ class CollegeListView(ListView):
     template_name = 'college_list.html'
     paginate_by = 5
 
-def get_queryset(self, *args, **kwargs):
-        qs = super(CollegeListView, self).get_queryset(*args, **kwargs)
-        if self.request.GET.get('q') is not None:
-            query = self.request.GET.get('q')
-            qs = qs.filter(Q(name__icontains=query) | Q(description__icontains=query))
-        return qs
+    def get_queryset(self, *args, **kwargs):
+            qs = super(CollegeListView, self).get_queryset(*args, **kwargs)
+            if self.request.GET.get('q') is not None:
+                query = self.request.GET.get('q')
+                qs = qs.filter(Q(college_name__icontains=query))
+            return qs
 
 class CollegeCreateView(CreateView):
     model = College
