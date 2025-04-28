@@ -1,0 +1,280 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="page-inner">
+    <h4 class="page-title">Chart.js</h4>
+    <div class="page-category">
+        Simple yet flexible JavaScript charting for designers & developers. Please checkout their
+        <a href="https://www.chartjs.org/" target="_blank">full documentation</a>.
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Monthly Enrollment Trends for All Organizations</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="lineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Students Per Organization</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Total Student Enrollment Per Program</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="pieChart" style="width: 50%; height: 50%"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Distribution of Students in All Colleges</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="doughnutChart" style="width: 50%; height: 50%"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Top 5 Most Popular Programs (Student Count)</div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container">
+                        <canvas id="bubbleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block chart %} 
+
+
+<script>
+    // Dynamic Bar Chart displaying total enrollments per organization in "Bar Chart"
+    fetch("/barChart/")
+        .then(response => response.json())
+        .then(result => {
+            var organizations = Object.keys(result);
+            var enrollmentCounts = organizations.map(org => result[org]);
+            var maxEnrollment = Math.max(...enrollmentCounts);
+
+            var barChartCtx = document.getElementById("barChart").getContext("2d");
+            new Chart(barChartCtx, {
+                type: "bar",
+                data: {
+                    labels: organizations,
+                    datasets: [
+                        {
+                            label: "Total Students",
+                            backgroundColor: "#1d7af3",
+                            borderColor: "#1d7af3",
+                            data: enrollmentCounts
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: { position: "top" },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                max: maxEnrollment
+                            }
+                        }]
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+    
+    // Dynamic Pie Chart displaying total students per program
+    fetch("/pieChart/")
+        .then(response => response.json())
+        .then(result => {
+            var programs = Object.keys(result);
+            var studentCounts = programs.map(prog => result[prog]);
+            var colors = [
+                "#1d7af3", "#f3545d", "#fdaf4b", "#59d05d", "#716aca", "#ffa534", "#4054b2", "#d7263d"
+            ];
+
+            var pieChartCtx = document.getElementById("pieChart").getContext("2d");
+            new Chart(pieChartCtx, {
+                type: "pie",
+                data: {
+                    labels: programs,
+                    datasets: [{
+                        data: studentCounts,
+                        backgroundColor: colors.slice(0, programs.length),
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            fontColor: "rgb(154, 154, 154)",
+                            fontSize: 11,
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+    
+    // Dynamic Line Chart for monthly enrollment trends per organization
+    fetch("/lineChart/")
+        .then(response => response.json())
+        .then(result => {
+            var months = result.months;
+            var orgs = Object.keys(result.data);
+            var colors = [
+                "#1d7af3", "#f3545d", "#fdaf4b", "#59d05d", "#716aca", "#ffa534", "#4054b2", "#d7263d"
+            ];
+            var datasets = orgs.map((org, idx) => ({
+                label: org,
+                data: result.data[org],
+                borderColor: colors[idx % colors.length],
+                fill: false,
+                borderWidth: 2
+            }));
+
+            var ctx = document.getElementById("lineChart").getContext("2d");
+            new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: months,
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: { position: "top" },
+                    scales: {
+                        yAxes: [{
+                            ticks: { beginAtZero: true }
+                        }]
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+
+    // Dynamic Doughnut Chart: Distribution of students across colleges
+    fetch("/doughnutChart/")
+        .then(response => response.json())
+        .then(result => {
+            var colleges = Object.keys(result);
+            var studentCounts = colleges.map(college => result[college]);
+            var colors = [
+                "#f3545d", "#fdaf4b", "#1d7af3", "#59d05d", "#716aca", "#ffa534", "#4054b2", "#d7263d"
+            ];
+
+            var doughnutChartCtx = document.getElementById("doughnutChart").getContext("2d");
+            new Chart(doughnutChartCtx, {
+                type: "doughnut",
+                data: {
+                    labels: colleges,
+                    datasets: [{
+                        data: studentCounts,
+                        backgroundColor: colors.slice(0, colleges.length)
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: {
+                        position: "bottom"
+                    },
+                    layout: {
+                        padding: {
+                            left: 20, right: 20, top: 20, bottom: 20
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+
+    // Dynamic Bubble Chart: Top 5 most popular programs
+    fetch("/bubbleChart/")
+        .then(response => response.json())
+        .then(result => {
+            var ctx = document.getElementById("bubbleChart").getContext("2d");
+            new Chart(ctx, {
+                type: "bubble",
+                data: {
+                    datasets: result.datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    legend: { position: "bottom" },
+                    scales: {
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Program (arbitrary position)"
+                            },
+                            ticks: {
+                                min: 0,
+                                max: 6,
+                                stepSize: 1,
+                                callback: function(value, index, values) {
+                                    // Show program names on x axis
+                                    var dataset = result.datasets.find(ds => ds.data[0].x === value);
+                                    return dataset ? dataset.label : '';
+                                }
+                            }
+                        }],
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: "Number of Students"
+                            },
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var dataset = data.datasets[tooltipItem.datasetIndex];
+                                return dataset.label + ': ' + dataset.data[0].y + ' students';
+                            }
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => console.error("Error:", error));
+</script>
+{% endblock %}

@@ -1,22 +1,6 @@
-"""
-URL configuration for projectsite project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path, re_path
-from studentorg.views import HomePageView, OrganizationList, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView
+from studentorg.views import HomePageView, OrganizationList, OrganizationCreateView, OrganizationUpdateView, OrganizationDeleteView, ChartView, BarChartStudentEnrollment, PieChartStudentProgram, LineChartMonthlyEnrollment, DoughnutChartStudentCollege, BubbleChartTopPrograms
 from studentorg import views
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import LoginView, LogoutView
@@ -44,6 +28,12 @@ urlpatterns = [
     path('program_list/add/', views.ProgramCreateView.as_view(), name='program-add'),
     path('program_list/<pk>/', views.ProgramUpdateView.as_view(), name='program-update'),
     path('program_list/<pk>/delete/', views.ProgramDeleteView.as_view(), name='program-delete'),
+    path('charts/', ChartView.as_view(), name='charts'),
+    path('barChart/', BarChartStudentEnrollment, name='bar-chart'),
+    path('pieChart/', PieChartStudentProgram, name='pie-chart'),
+    path('lineChart/', LineChartMonthlyEnrollment, name='line-chart'),
+    path('doughnutChart/', DoughnutChartStudentCollege, name='doughnut-chart'),
+    path('bubbleChart/', BubbleChartTopPrograms, name='bubble-chart'),
     path('login/', LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
 ]
