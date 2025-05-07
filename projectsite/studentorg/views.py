@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.views.generic.list import ListView
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from studentorg.models import Organization, OrgMember, Student, College, Program
+from studentorg.models import Organization, OrgMember, Student, College, Program, Boat
 from studentorg.forms import OrganizationForm, OrgMemberForm, StudentForm, CollegeForm, ProgramForm
 from django.urls import reverse_lazy
 from typing import Any
@@ -12,6 +12,7 @@ from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.contrib import messages
 
 @method_decorator(login_required, name='dispatch')
 
@@ -315,6 +316,12 @@ class CollegeUpdateView(UpdateView):
     template_name = 'college_edit.html'
     success_url = reverse_lazy('college-list')
 
+    def form_valid(self, form):
+        college_name = form.instance.college_name
+        messages.success(self.request, f'College "{college_name}" has been successfully updated.')
+
+        return super().form_valid(form)
+
 class CollegeDeleteView(DeleteView):
     model = College
     template_name = 'college_del.html'
@@ -351,5 +358,63 @@ class ProgramDeleteView(DeleteView):
     model = Program
     template_name = 'program_del.html'
     success_url = reverse_lazy('program-list')
+
+class BoatCreateView(CreateView):
+    model = Boat
+    fields = "__all__"
+    template_name = "boat_form.html"
+    success_url = reverse_lazy('boat-list')
+
+    def post(self, request, *args, **kwargs):
+        length = request.POST.get('length')
+        width = request.POST.get('width')
+        height = request.POST.get('height')
+
+        # Validate dimensions
+        errors = []
+        for field_name, value in [('length', length), ('width', width), ('height', height)]:
+            try:
+                if float(value) <= 0:
+                    errors.append(f"{field_name.capitalize()} must be greater than 0.")
+            except (ValueError, TypeError):
+                errors.append(f"{field_name.capitalize()} must be a valid number.")
+
+        # If errors exist, display them and return to the form
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return self.form_invalid(self.get_form())
+
+        # Call the parent's post() if validation passes
+        return super().post(request, *args, **kwargs)
+
+class BoatUpdateView(UpdateView):
+    model = Boat
+    fields = "__all__"
+    template_name = "boat_form.html"
+    success_url = reverse_lazy('boat-list')
+
+    def post(self, request, *args, **kwargs):
+        length = request.POST.get('length')
+        width = request.POST.get('width')
+        height = request.POST.get('height')
+
+        # Validate dimensions
+        errors = []
+        for field_name, value in [('length', length), ('width', width), ('height', height)]:
+            try:
+                if float(value) <= 0:
+                    errors.append(f"{field_name.capitalize()} must be greater than 0.")
+            except (ValueError, TypeError):
+                errors.append(f"{field_name.capitalize()} must be a valid number.")
+
+        # If errors exist, display them and return to the form
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return self.form_invalid(self.get_form())
+
+        # Call the parent's post() if validation passes
+        return super().post(request, *args, **kwargs)
 
 # Create your views here.
