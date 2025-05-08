@@ -418,33 +418,42 @@
 	<div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050">
 
 	</div>
-	{% if messages %}
+{% if messages %}
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        {% for message in messages %}
-            const toastHTML = `
-            <div class="toast" role="alert" style="margin-bottom: 10px;" data-delay="3000">
-                <div class="toast-header">
-                    <img src="{% static 'images/logo-mini.svg' %}" class="rounded mr-2" style="width: 25px; height: 25px;" alt="logo">
-                    <strong class="mr-auto">Bootstrap</strong>
-                    <small>Just now</small>
-                    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="toast-body">
-                    {{ message|escapejs }}
-                </div>
-            </div>`;
-            document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
-            
-            const toastElement = document.getElementById('toast-container').lastElementChild;
-            const toast = new bootstrap.Toast(toastElement);
-            toast.show();
-        {% endfor %}
-    });
+	document.addEventListener("DOMContentLoaded", function() {
+		{% for message in messages %}
+			const toastHTML = `
+			<div class="toast" role="alert" data-delay="3000" data-autohide="true" style="margin-bottom: 10px;">
+				<div class="toast-header">
+					<img src="{% static 'images/logo-mini.svg' %}" class="rounded mr-2" style="width: 25px; height: 25px;" alt="logo">
+					<strong class="mr-auto">Bootstrap</strong>
+					<small>Just now</small>
+					<button type="button" class="ml-2 mb-1 close" data-bs-dismiss="toast" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+				</div>
+				<div class="toast-body">
+					{{ message|escapejs }}
+				</div>
+			</div>`;
+			document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
+			
+			const toastElement = document.getElementById('toast-container').lastElementChild;
+			const toast = new bootstrap.Toast(toastElement);
+			toast.show();
+		{% endfor %}
+	});
 </script>
 {% endif %}
+
+<script>
+    document.addEventListener('click', function(event) {
+        if (event.target.closest(".toast .close")) {
+            var toastElement = event.target.closest('.toast');
+            $(toastElement).toast('hide');
+        }
+    });
+</script>
 
 <script src="{% static 'js/core/jquery.3.2.1.min.js' %}"></script>
 <script src="{% static 'js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js' %}"></script>
